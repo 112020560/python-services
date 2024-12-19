@@ -1,0 +1,18 @@
+.resources: &default_resources
+  Resources:
+    FComprasTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.FComprasTable}
+        AttributeDefinitions:
+          - AttributeName: customer_id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: customer_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+dev:
+  resources: *default_resources
+production:
+  resources: *default_resources

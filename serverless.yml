@@ -1,6 +1,6 @@
 # Ensures this Service is used with the correct Serverless Framework Access Key.
 org: fondeadora
-service: select-occupation-services
+service: fcompras-services
 
 frameworkVersion: "4"
 
@@ -20,7 +20,7 @@ provider:
     apiGateway: true
     lambda: true
   environment:
-    POWERTOOLS_SERVICE_NAME: select-occupation-services
+    POWERTOOLS_SERVICE_NAME: fcompras-services
     POWERTOOLS_LOG_LEVEL: INFO
     SERVICE: ${self:service}
     STAGE: ${self:provider.stage}
@@ -29,19 +29,14 @@ provider:
       statements: ${file(config/iam.yml):${self:provider.stage}.iamRoleStatements}
 
 functions:
-  list_occupations:
-    handler: src.occupations.entrypoints.list_handler.handler
+  occupations:
+    handler: src.occupations.entrypoints.select_occupation_handler.handler
     events:
       - httpApi:
-          method: GET
-          path: /occupations
+          method: PUT
+          path: /occupations-service
     environment:
-      OCCUPATIONS_TABLE: ${self:custom.OccupationsTable}
-
-  validate_occupation:
-    handler: src.occupations.entrypoints.validate_handler.handler
-    environment:
-      OCCUPATIONS_TABLE: ${self:custom.OccupationsTable}
+      FCOMPRAS_TABLE: ${self:custom.FComprasTable}
 
 plugins:
   - serverless-python-requirements
@@ -55,7 +50,7 @@ custom:
     useDownloadCache: true
     slim: true
   stages: ${file(config/stages.yml):stages}
-  OccupationsTable: ${self:service}-occupation-data-${self:provider.stage}
+  FComprasTable: ${self:service}-fcompras-data-${self:provider.stage}
 
 package:
   patterns:

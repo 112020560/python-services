@@ -1,0 +1,110 @@
+.iamRoleStatements: &default_roles
+  - Effect: Allow
+    Action:
+      - ssm:GetParameter
+      - ssm:GetParameters
+      - ssm:DescribeParameters
+    Resource:
+      Fn::Join:
+        - ":"
+        - - "arn:aws:ssm"
+          - Ref: "AWS::Region"
+          - Ref: "AWS::AccountId"
+          - "*"
+  - Effect: Allow
+    Action:
+      - secretsmanager:GetSecretValue
+    Resource:
+      Fn::Join:
+        - ":"
+        - - "arn:aws:secretsmanager"
+          - Ref: "AWS::Region"
+          - Ref: "AWS::AccountId"
+          - "*"
+  - Effect: Allow
+    Action:
+      - "s3:PutObject"
+      - "s3:PutObjectAcl"
+      - "s3:DeleteObject"
+      - "s3:GetObject"
+      - "s3:ListBucket"
+    Resource: "*"
+  - Effect: Allow
+    Action:
+      - ec2:CreateNetworkInterface
+      - ec2:DescribeNetworkInterfaces
+      - ec2:DetachNetworkInterface
+      - ec2:DeleteNetworkInterface
+    Resource: "*"
+  - Effect: Allow
+    Action:
+      - lambda:InvokeFunction
+    Resource:
+      Fn::Join:
+        - ":"
+        - - "arn:aws:lambda"
+          - Ref: "AWS::Region"
+          - Ref: "AWS::AccountId"
+          - "*"
+  - Effect: Allow
+    Action:
+      - sqs:SendMessage
+      - sqs:GetQueueUrl
+      - sqs:ReceiveMessage
+      - sqs:ListQueues
+    Resource:
+      Fn::Join:
+        - ":"
+        - - "arn:aws:sqs"
+          - Ref: "AWS::Region"
+          - Ref: "AWS::AccountId"
+          - "*"
+  - Effect: Allow
+    Action:
+      - dynamodb:BatchWriteItem
+      - dynamodb:Scan
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+      - dynamodb:DescribeTable
+      - dynamodb:ListStreams
+      - dynamodb:Query
+      - dynamodb:DescribeStream
+      - dynamodb:GetRecords
+      - dynamodb:GetShardIterator
+      - dynamodb:ListTables
+      - dynamodb:BatchGetItem
+      - dynamodb:DescribeReservedCapacity
+      - dynamodb:DescribeReservedCapacityOfferings
+      - dynamodb:DeleteItem
+    Resource: "arn:aws:dynamodb:us-east-1:*:*"
+  - Effect: Allow
+    Action:
+      - sns:Publish
+    Resource: ${ssm:/sns/channels/${self:provider.stage}/analytics-events}
+  - Effect: Allow
+    Action:
+      - states:StartExecution
+      - states:DescribeExecution
+    Resource:
+      Fn::Join:
+        - ":"
+        - - "arn:aws:states"
+          - Ref: "AWS::Region"
+          - Ref: "AWS::AccountId"
+          - "*"
+  - Effect: "Allow"
+    Action:
+      - appconfig:GetConfiguration
+      - appconfig:GetLatestConfiguration
+      - appconfig:StartConfigurationSession
+    Resource: "*"
+
+dev:
+  iamRoleStatements: *default_roles
+production:
+  iamRoleStatements: *default_roles
+staging:
+  iamRoleStatements:
+test:
+  iamRoleStatements:

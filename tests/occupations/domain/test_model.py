@@ -11,4 +11,8 @@ def test_occupation():
 
 def test_select_occupation():
     selected_occupation = select_occupation("employee")
-    assert selected_occupation.occupation == OccupationType.EMPLOYEE
+    expected = {
+        "occupation": OccupationType.EMPLOYEE,
+        "is_real_property": True
+    }
+    assert selected_occupation == expected

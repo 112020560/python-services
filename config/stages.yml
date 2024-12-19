@@ -1,0 +1,30 @@
+.vpc: &default_vpc
+  securityGroupIds:
+    - sg-0001daeabe500574b
+  subnetIds:
+    - subnet-0439b39c0cab559e2
+    - subnet-0d6c1491ae45c44c9
+stages:
+  dev:
+    stage: dev
+    vpc:
+      securityGroupIds:
+        - sg-0ed05d9800e9ad777
+      subnetIds:
+        - subnet-020267d11bfb7b907
+        - subnet-0343820a835325856
+    warmupRole: arn:aws:iam::481300263782:role/truu-warmup-dev-role
+    adminAwsApplicationTag: arn:aws:resource-groups:us-east-1:481300263782:group/admin/0eqy53zso922yodwxbmvn1m4h3
+  production:
+    stage: production
+    vpc:
+      securityGroupIds:
+        - sg-075d376bf6e11967b
+      subnetIds:
+        - subnet-05c27bec9bdc143fc
+        - subnet-04c7dd7ea9bd5a623
+        - subnet-0c02bdbe3e8a40856
+        - subnet-0759988f05ea2a525
+        - subnet-0df9730f14d817a43
+    warmupRole: arn:aws:iam::994259706805:role/truu-warmup-production-role
+    adminAwsApplicationTag: arn:aws:resource-groups:us-east-1:994259706805:group/admin/06wzq2h1z86ckvlnklr7kjva7i
