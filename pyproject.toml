@@ -1,0 +1,91 @@
+[project]
+name = "select-occupation-services"
+version = "0.1.0"
+description = "Lambda services for select occupation"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "mypy-boto3-dynamodb>=1.35.74",
+    "mypy-boto3-sqs>=1.35.0",
+    "pydantic>=2.9.2",
+    "pyjwt>=2.10.1",
+    "sentry-sdk>=2.19.0",
+    "sqlmodel>=0.0.22",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.389",
+    "pytest>=8.3.3",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.7.3",
+    "aws-lambda-powertools[datamasking,parser,tracer]>=3.3.0",
+    "poethepoet>=0.30.0",
+    "boto3>=1.35.63",
+    "botocore>=1.35.63",
+    "boto3-stubs[sqs]>=1.35.63",
+]
+
+[tool.poe.env]
+PYTHONPATH = "."
+
+[tool.poe.tasks]
+# Testing
+test = "pytest -v tests"
+test-cov = "pytest -v --cov=src --cov-report=term-missing tests"
+
+# Linting and formatting
+format = "ruff format ."
+check = "ruff check --fix ."
+typecheck = "pyright"
+
+lint = [
+  "check",
+]
+
+# Combined checks
+ci = [
+  "format",
+  "lint",
+  "test"
+]
+
+[tool.ruff]
+target-version = "py313"
+include = [
+  "src/**/*.py",
+  "tests/**/*.py"
+]
+
+[tool.ruff.lint]
+select = [
+    "ALL"
+]
+ignore = [
+  "COM812",
+  "D",
+  "ISC001",
+  "ANN",
+  "PLW0603",
+  "EM102",
+  "E501",
+  "PGH003",
+  "B028",
+  "PLR0913",
+  "TCH002",
+  "TRY003",
+  "B028",
+  "EM101",
+  "B904",
+  "TRY002",
+  "BLE001",
+  "DTZ005",
+]
+
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.13"
+typeCheckingMode = "basic"
+reportMissingImports = "warning"
+reportMissingTypeStubs = "warning"
+reportUntypedFunctionDecorator = false

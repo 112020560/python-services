@@ -1,0 +1,78 @@
+# Ensures this Service is used with the correct Serverless Framework Access Key.
+org: fondeadora
+service: select-occupation-services
+
+frameworkVersion: "4"
+
+configValidationMode: error
+
+provider:
+  name: aws
+  runtime: python3.13
+  stage: ${opt:stage, "dev"}
+  region: us-east-1
+  logRetentionInDays: 365
+  vpc: ${self:custom.stages.${self:provider.stage}.vpc}
+  layers:
+    - arn:aws:lambda:us-east-1:017000801446:layer:AWSLambdaPowertoolsPythonV3-python313-x86_64:4
+    - arn:aws:lambda:us-east-1:481300263782:layer:psycopg2-313:1
+  tracing:
+    apiGateway: true
+    lambda: true
+  environment:
+    POWERTOOLS_SERVICE_NAME: select-occupation-services
+    POWERTOOLS_LOG_LEVEL: INFO
+    SERVICE: ${self:service}
+    STAGE: ${self:provider.stage}
+  iam:
+    role:
+      statements: ${file(config/iam.yml):${self:provider.stage}.iamRoleStatements}
+
+functions:
+  list_occupations:
+    handler: src.occupations.entrypoints.list_handler.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /occupations
+    environment:
+      OCCUPATIONS_TABLE: ${self:custom.OccupationsTable}
+
+  validate_occupation:
+    handler: src.occupations.entrypoints.validate_handler.handler
+    environment:
+      OCCUPATIONS_TABLE: ${self:custom.OccupationsTable}
+
+plugins:
+  - serverless-python-requirements
+
+resources: ${file(config/resources.yml):${self:provider.stage}.resources}
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+    useStaticCache: true
+    useDownloadCache: true
+    slim: true
+  stages: ${file(config/stages.yml):stages}
+  OccupationsTable: ${self:service}-occupation-data-${self:provider.stage}
+
+package:
+  patterns:
+    - "!tests/**"
+    - "!.github/**"
+    - "!.vscode/**"
+    - "!.idea/**"
+    - "!.ruff_cache/**"
+    - "!.pytest_cache/**"
+    - "!node_modules/**"
+    - "!package.json"
+    - "!package-lock.json"
+    - "!.venv/**"
+    - "!uv.lock"
+    - "!pyproject.toml"
+    - "!requirements.txt"
+    - "!README.md"
+    - "!**/__pycache__/**"
+    - "!**/*.pyc"
+    - "!**/*.pyi"

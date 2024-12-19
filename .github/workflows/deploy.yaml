@@ -1,0 +1,53 @@
+name: 🚀 Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.13"
+  AWS_REGION: "us-east-1"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          version: "0.5.2"
+
+      - name: Install Serverless Framework
+        run: npm install
+
+      - name: Install dependencies
+        run: uv sync -p ${{ env.PYTHON_VERSION }}
+
+      - name: Export Python dependencies
+        run: uv export --no-dev --output-file requirements.txt
+
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ format('arn:aws:iam::{0}:role/{1}', vars.AWS_ACCOUNT_ID, vars.AWS_DEPLOYMENT_ROLE) }}
+          role-session-name: ci-tools-${{ github.run_id }}@${{ github.sha }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy
+        run: npx serverless deploy --stage dev
+        env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
